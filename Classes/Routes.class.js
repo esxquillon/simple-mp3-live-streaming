@@ -22,9 +22,11 @@ module.exports = class CRoutes {
             handler: (request, h) => {
                 // Add a new sink into the current session.
                 const { id, responseSink } = this.cQueue.createSink();
+
                 console.log('Connected', id);
+
                 request.app.sinkId = id;
-                return h.response(responseSink).type('audio/mpeg; codecs=PCM');
+                return h.response(responseSink).type('audio/mpeg');
             },
             options: {
                 ext: {
@@ -32,7 +34,9 @@ module.exports = class CRoutes {
                         method: (request, h) => {
                             // Remove the sink id from the disconnected session.
                             request.events.once('disconnect', () => {
+
                                 console.log('Disconnected', request.app.sinkId);
+                                
                                 this.cQueue.removeSink(request.app.sinkId);
                             });
                             return h.continue;
